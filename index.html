@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BlockVote — Blockchain E-Voting System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="bg-grid"></div>
+
+<div class="app">
+
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">🗳️</div>
+      <div class="logo-text">
+        <h1>BlockVote</h1>
+        <p>BLOCKCHAIN E-VOTING SYSTEM &bull; CSE B.Tech Final Year Project</p>
+      </div>
+    </div>
+    <div class="header-status">
+      <div class="status-badge online"><span class="dot"></span> NETWORK LIVE</div>
+      <div class="status-badge blocks" id="block-count-badge">⛓ 1 BLOCKS</div>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" onclick="showTab('register')">📋 Register</button>
+    <button class="tab" onclick="showTab('authenticate')">🔐 Authenticate</button>
+    <button class="tab" onclick="showTab('vote')">🗳️ Cast Vote</button>
+    <button class="tab" onclick="showTab('blockchain')">⛓ Blockchain</button>
+    <button class="tab" onclick="showTab('monitor')">🤖 AI Monitor</button>
+    <button class="tab" onclick="showTab('results')">📊 Results</button>
+  </nav>
+  <section class="panel active" id="panel-register">
+
+    <div class="card">
+      <div class="card-title">Voter Registration</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">FULL NAME</label>
+          <input class="form-input" id="reg-name" placeholder="e.g. Rajesh Kumar Sharma" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">GOVERNMENT ID (AADHAAR / PAN / PASSPORT)</label>
+          <input class="form-input" id="reg-id" placeholder="e.g. 1234-5678-9012" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">DATE OF BIRTH</label>
+          <input class="form-input" type="date" id="reg-dob" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">CONSTITUENCY</label>
+          <input class="form-input" id="reg-const" placeholder="e.g. Eluru, West Godavari" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">BIOMETRIC FINGERPRINT HASH (AUTO-CAPTURED)</label>
+          <input class="form-input" id="reg-bio" placeholder="Scanning biometric sensor..." readonly />
+        </div>
+        <div class="form-group">
+          <label class="form-label">MOBILE NUMBER (OTP VERIFICATION)</label>
+          <input class="form-input" id="reg-mobile" placeholder="+91 XXXXX XXXXX" />
+        </div>
+      </div>
+
+      <div class="verify-steps">
+        <div class="step" id="step-id">
+          <div class="step-circle">1</div>
+          <div class="step-label">ID Verify</div>
+        </div>
+        <div class="step" id="step-bio">
+          <div class="step-circle">2</div>
+          <div class="step-label">Biometric</div>
+        </div>
+        <div class="step" id="step-ai">
+          <div class="step-circle">3</div>
+          <div class="step-label">AI Check</div>
+        </div>
+        <div class="step" id="step-otp">
+          <div class="step-circle">4</div>
+          <div class="step-label">OTP</div>
+        </div>
+        <div class="step" id="step-reg-done">
+          <div class="step-circle">✓</div>
+          <div class="step-label">Registered</div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="reg-btn" onclick="startRegistration()">
+        ⚡ Begin Registration Process
+      </button>
+    </div>
+
+    <div class="card" id="reg-result" style="display:none">
+      <div class="card-title">Registration Confirmation</div>
+      <div class="reg-success-box">
+        <div class="reg-success-icon">✅</div>
+        <div>
+          <div class="reg-success-name" id="reg-success-name"></div>
+          <div class="reg-success-meta">
+            Voter ID: <span id="reg-voter-id" class="voter-id-display"></span>
+          </div>
+          <div class="reg-success-meta">🔒 Stored in encrypted blockchain voter registry</div>
+          <div class="reg-success-meta">📋 Voter ID &amp; Biometric auto-filled in Authenticate tab</div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <section class="panel" id="panel-authenticate">
+
+    <div class="stats-grid stats-3">
+      <div class="stat-card">
+        <div class="stat-label">AUTH METHOD</div>
+        <div class="stat-value stat-sm">Multi-Factor</div>
+        <div class="stat-sub">ID + Biometric + AI</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">SUCCESS RATE</div>
+        <div class="stat-value" id="auth-rate">—</div>
+        <div class="stat-sub">Fraud detection: Active</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-label">AI MODEL</div>
+        <div class="stat-value stat-sm">ResNet-50</div>
+        <div class="stat-sub">Anomaly detection engine</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Voter Authentication Phase</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">VOTER ID</label>
+          <input class="form-input" id="auth-vid" placeholder="VTR-XXXXXXXXXXXXXXXX" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">BIOMETRIC HASH</label>
+          <input class="form-input" id="auth-bio" placeholder="Auto-filled from registration" />
+        </div>
+      </div>
+
+      <div class="auth-log" id="auth-status" style="display:none">
+        <div id="auth-log-lines"></div>
+      </div>
+
+      <button class="btn btn-primary" onclick="authenticate()">
+        🔐 Authenticate Voter
+      </button>
+
+      <div id="auth-result" style="display:none; margin-top:16px">
+        <div id="auth-result-box" class="auth-result-box">
+          <div id="auth-result-icon" class="auth-result-icon"></div>
+          <div>
+            <div id="auth-result-title" class="auth-result-title"></div>
+            <div id="auth-result-msg" class="auth-result-msg"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <section class="panel" id="panel-vote">
+    <div class="card">
+      <div class="card-title">Cast Your Vote</div>
+
+      <div class="notice notice-warn">
+        ⚠️ Authenticate first. Your vote is AES-256 encrypted, digitally signed, and permanently stored on the blockchain. It cannot be altered or deleted.
+      </div>
+
+      <div class="candidates-grid" id="candidates-grid"></div>
+
+      <div class="vote-actions">
+        <button class="btn btn-success" onclick="castVote()" id="cast-btn" disabled>
+          🗳️ Cast Vote &amp; Sign Block
+        </button>
+        <span id="vote-msg" class="vote-hint">Authenticate first to enable voting</span>
+      </div>
+
+      <div class="tx-popup" id="tx-popup">
+        <div class="tx-title">✅ Vote Cast Successfully!</div>
+        <div class="tx-desc">
+          Your vote has been AES-256 encrypted, digitally signed, and broadcast to all 7 blockchain nodes. Consensus achieved. Block mined.
+        </div>
+        <div class="tx-hash" id="tx-hash-val"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-blockchain">
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">TOTAL BLOCKS</div>
+        <div class="stat-value" id="blk-count">1</div>
+        <div class="stat-sub">Including genesis block</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">HASH ALGORITHM</div>
+        <div class="stat-value stat-sm">SHA-256</div>
+        <div class="stat-sub">Tamper-proof hashing</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-label">ACTIVE NODES</div>
+        <div class="stat-value">7</div>
+        <div class="stat-sub">Consensus: 51% rule</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-label">CHAIN VALIDITY</div>
+        <div class="stat-value chain-valid" id="chain-valid">✓ Valid</div>
+        <div class="stat-sub">All blocks verified</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Live Blockchain Explorer</div>
+      <div class="blockchain" id="blockchain-view"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Block Validation Algorithm</div>
+      <div class="code-block">
+        <span class="c-comment">// FUNCTION Validate_Block(block)</span><br>
+        <span class="c-key">STEP 1:</span> VERIFY block.hash == SHA256(data + prevHash + nonce)<br>
+        <span class="c-key">STEP 2:</span> CHECK block.prevHash == blockchain[n-1].hash<br>
+        <span class="c-key">STEP 3:</span> VERIFY digital_signature(voterID, publicKey)<br>
+        <span class="c-key">STEP 4:</span> CHECK voter_has_not_voted_before(voterID)<br>
+        <span class="c-key">STEP 5:</span> VALIDATE transaction_integrity(encryptedVote)<br><br>
+        <span class="c-ok">IF</span> all_checks_pass → ADD to chain → BROADCAST to 7 nodes<br>
+        <span class="c-bad">ELSE</span> → REJECT block → ALERT AI_Monitoring() → LOG anomaly<br><br>
+        <span class="c-comment">// Encryption: AES-256 | Signature: ECDSA | Consensus: PoA 51%</span>
+      </div>
+    </div>
+
+  </section>
+
+  <section class="panel" id="panel-monitor">
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">EVENTS MONITORED</div>
+        <div class="stat-value" id="mon-total">0</div>
+        <div class="stat-sub">All transactions</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">CLEAN EVENTS</div>
+        <div class="stat-value stat-green" id="mon-clean">0</div>
+        <div class="stat-sub">Verified legitimate</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-label">FLAGGED</div>
+        <div class="stat-value stat-amber" id="mon-flagged">0</div>
+        <div class="stat-sub">Suspicious patterns</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-label">BLOCKED</div>
+        <div class="stat-value stat-red" id="mon-blocked">0</div>
+        <div class="stat-sub">Fraud attempts stopped</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">AI Fraud Detection Log — Real-Time</div>
+      <div class="ai-log" id="ai-log">
+        <div class="log-line">
+          <span class="log-time">00:00:01</span>
+          <span class="log-info">AI model initialized · ResNet-50 anomaly detector loaded into memory</span>
+        </div>
+        <div class="log-line">
+          <span class="log-time">00:00:02</span>
+          <span class="log-ok">Blockchain network connected · 7 nodes online · Consensus ready</span>
+        </div>
+        <div class="log-line">
+          <span class="log-time">00:00:03</span>
+          <span class="log-info">Cloud monitoring active · Watching voting patterns in real time...</span>
+        </div>
+      </div>
+      <div class="log-actions">
+        <button class="btn btn-outline" onclick="simulateFraud()">⚠️ Simulate Fraud Attempt</button>
+        <button class="btn btn-outline" onclick="clearLog()">🗑️ Clear Log</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">AI Monitoring Algorithm</div>
+      <div class="code-block">
+        <span class="c-comment">// FUNCTION AI_Monitoring() — runs continuously in cloud</span><br>
+        <span class="c-key">WATCH:</span> voting_rate_per_IP, duplicate_biometrics, hash_mismatches<br>
+        <span class="c-key">WATCH:</span> geolocation_anomalies, timing_patterns, signature_validity<br><br>
+        <span class="c-ok">IF</span> votes_per_second &gt; threshold → FLAG &amp; ALERT admin<br>
+        <span class="c-ok">IF</span> duplicate_voterID detected → BLOCK &amp; INVALIDATE transaction<br>
+        <span class="c-ok">IF</span> biometric_confidence &lt; 95% → REJECT &amp; REQUEST re-scan<br>
+        <span class="c-bad">ALERT:</span> real-time push notification to election commission
+      </div>
+    </div>
+
+  </section>
+  <section class="panel" id="panel-results">
+
+    <div class="card">
+      <div class="card-title">Live Election Results</div>
+      <div id="results-view">
+        <div class="no-data">No votes cast yet. Results will appear here automatically.</div>
+      </div>
+      <div class="notice notice-info" style="margin-top:16px">
+        🔒 BLOCKCHAIN INTEGRITY: <strong>VERIFIED</strong> &bull;
+        All votes decrypted from immutable chain &bull; Tallied in real time &bull; Tamper-proof
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Count Votes Algorithm</div>
+      <div class="code-block">
+        <span class="c-comment">// FUNCTION Count_Votes()</span><br>
+        <span class="c-key">STEP 1:</span> RETRIEVE all blocks from blockchain (skip genesis)<br>
+        <span class="c-key">STEP 2:</span> DECRYPT each block's vote using election private key<br>
+        <span class="c-key">STEP 3:</span> VERIFY digital signature of each vote transaction<br>
+        <span class="c-key">STEP 4:</span> COUNT votes for each candidate<br>
+        <span class="c-key">STEP 5:</span> DISPLAY results with percentage breakdown<br><br>
+        <span class="c-ok">Results are immutable — sourced directly from blockchain</span>
+      </div>
+    </div>
+
+  </section>
+
+</div><!-- end .app -->
+
+<script src="js/app.js"></script>
+</body>
+</html>
